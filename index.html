@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AMSC Offshore HRM — Dashboard</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@500;600;700;800&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/css/bootstrap.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+
+<style>
+:root{
+  --navy-900:#0B2545;
+  --navy-800:#0F2E56;
+  --navy-700:#173A64;
+  --navy-600:#234C7C;
+  --teal:#0EA5A4;
+  --teal-light:#5EEAD4;
+  --teal-dim:rgba(14,165,164,.12);
+  --amber:#D89A2B;
+  --amber-dim:rgba(216,154,43,.12);
+  --coral:#D9614F;
+  --coral-dim:rgba(217,97,79,.12);
+  --green:#2F9E6E;
+  --green-dim:rgba(47,158,110,.12);
+  --gray-50:#F6F8F9;
+  --gray-100:#EEF2F4;
+  --gray-200:#E1E7EB;
+  --gray-400:#9AACB8;
+  --gray-600:#5B6E7C;
+  --gray-800:#26333D;
+  --white:#FFFFFF;
+  --surface:#FFFFFF;
+  --bg:#F1F4F6;
+  --text:#1C2833;
+  --text-dim:#66798A;
+  --border:#E3E9ED;
+  --shadow:0 1px 2px rgba(15,46,86,.04),0 8px 24px -12px rgba(15,46,86,.10);
+  --radius:14px;
+}
+[data-theme="dark"]{
+  --navy-900:#081A33;
+  --navy-800:#0A2140;
+  --navy-700:#0F2C4F;
+  --surface:#122B45;
+  --bg:#0A1A2C;
+  --text:#E7EEF3;
+  --text-dim:#8FA3B3;
+  --border:#1D3C5B;
+  --gray-100:#132C46;
+  --shadow:0 1px 2px rgba(0,0,0,.2),0 8px 24px -12px rgba(0,0,0,.5);
+}
+*{box-sizing:border-box;}
+body{
+  font-family:'Manrope',sans-serif;
+  background:var(--bg);
+  color:var(--text);
+  margin:0;
+  transition:background .25s ease,color .25s ease;
+}
+h1,h2,h3,h4,.font-display{ font-family:'Sora',sans-serif; letter-spacing:-.01em; }
+.stat-num{ font-family:'Sora',sans-serif; font-weight:700; letter-spacing:-.02em; }
+
+/* ===== Layout ===== */
+.app-shell{ display:flex; min-height:100vh; }
+
+/* ===== Sidebar ===== */
+.sidebar{
+  width:260px; flex-shrink:0;
+  background:linear-gradient(185deg,var(--navy-900) 0%,var(--navy-800) 100%);
+  color:#CBD9E6;
+  position:sticky; top:0; height:100vh; overflow-y:auto;
+  transition:margin-left .25s ease;
+  z-index:1030;
+}
+.sidebar::-webkit-scrollbar{ width:6px; }
+.sidebar::-webkit-scrollbar-thumb{ background:rgba(255,255,255,.15); border-radius:10px; }
+
+.brand{
+  display:flex; align-items:center; gap:.65rem;
+  padding:1.35rem 1.25rem 1.1rem;
+  border-bottom:1px solid rgba(255,255,255,.08);
+}
+.brand-mark{
+  width:38px; height:38px; border-radius:10px;
+  background:radial-gradient(circle at 30% 25%,var(--teal-light),var(--teal) 65%);
+  display:flex; align-items:center; justify-content:center;
+  color:var(--navy-900); font-size:1.05rem; flex-shrink:0;
+  box-shadow:0 4px 14px -3px rgba(14,165,164,.55);
+}
+.brand-text{ line-height:1.15; }
+.brand-text .b1{ font-family:'Sora',sans-serif; font-weight:700; font-size:.98rem; color:#fff; }
+.brand-text .b2{ font-size:.68rem; color:#8CA6BC; letter-spacing:.06em; text-transform:uppercase; }
+
+.nav-group-label{
+  font-size:.66rem; text-transform:uppercase; letter-spacing:.1em;
+  color:#5C7A93; padding:1.05rem 1.25rem .4rem;
+  font-weight:700;
+}
+.side-link{
+  display:flex; align-items:center; gap:.7rem;
+  padding:.55rem 1.25rem; margin:.05rem .6rem; border-radius:9px;
+  color:#B9CADA; text-decoration:none; font-size:.855rem; font-weight:600;
+  position:relative; cursor:pointer;
+}
+.side-link i.ico{ width:18px; text-align:center; font-size:.85rem; color:#7C97AE; }
+.side-link:hover{ background:rgba(255,255,255,.06); color:#fff; }
+.side-link.active{ background:var(--teal-dim); color:#fff; }
+.side-link.active i.ico{ color:var(--teal-light); }
+.side-link.active::before{
+  content:""; position:absolute; left:-.6rem; top:8px; bottom:8px; width:3px;
+  border-radius:3px; background:var(--teal);
+}
+.side-link .badge-mini{
+  margin-left:auto; font-size:.63rem; font-weight:700; padding:.15rem .4rem;
+  border-radius:6px; background:rgba(216,154,43,.22); color:#F0C773;
+}
+
+/* ===== Topbar ===== */
+.topbar{
+  position:sticky; top:0; z-index:1020;
+  background:var(--surface); border-bottom:1px solid var(--border);
+  display:flex; align-items:center; gap:1rem;
+  padding:.7rem 1.5rem; backdrop-filter:blur(6px);
+}
+.search-wrap{
+  flex:1; max-width:420px; position:relative;
+}
+.search-wrap i{ position:absolute; left:.9rem; top:50%; transform:translateY(-50%); color:var(--text-dim); font-size:.8rem;}
+.search-wrap input{
+  width:100%; border:1px solid var(--border); background:var(--gray-50);
+  border-radius:10px; padding:.55rem .9rem .55rem 2.2rem; font-size:.85rem; color:var(--text);
+  outline:none; transition:.15s;
+}
+[data-theme="dark"] .search-wrap input{ background:var(--gray-100); }
+.search-wrap input:focus{ border-color:var(--teal); box-shadow:0 0 0 3px var(--teal-dim); background:var(--surface); }
+
+.icon-btn{
+  width:38px; height:38px; border-radius:10px; border:1px solid var(--border);
+  background:var(--surface); color:var(--text-dim); display:flex; align-items:center; justify-content:center;
+  cursor:pointer; position:relative; flex-shrink:0; transition:.15s;
+}
+.icon-btn:hover{ background:var(--gray-50); color:var(--text); }
+.icon-btn .dot{
+  position:absolute; top:6px; right:7px; width:7px; height:7px; border-radius:50%;
+  background:var(--coral); border:2px solid var(--surface);
+}
+.user-chip{
+  display:flex; align-items:center; gap:.6rem; padding:.3rem .7rem .3rem .3rem;
+  border-radius:12px; border:1px solid var(--border); cursor:pointer; background:var(--surface);
+}
+.user-chip .av{
+  width:32px; height:32px; border-radius:9px; background:linear-gradient(135deg,var(--navy-700),var(--navy-900));
+  color:#fff; display:flex; align-items:center; justify-content:center; font-size:.72rem; font-weight:700;
+}
+.user-chip .name{ font-size:.8rem; font-weight:700; line-height:1.1;}
+.user-chip .role{ font-size:.68rem; color:var(--text-dim); }
+
+/* ===== Content ===== */
+.content{ flex:1; min-width:0; }
+.page-pad{ padding:1.6rem 1.7rem 3rem; }
+
+.page-head{ display:flex; align-items:flex-end; justify-content:space-between; flex-wrap:wrap; gap:.75rem; margin-bottom:1.4rem;}
+.page-head h1{ font-size:1.4rem; font-weight:700; margin:0; }
+.page-head .sub{ color:var(--text-dim); font-size:.85rem; margin-top:.15rem; }
+.btn-teal{ background:var(--teal); border-color:var(--teal); color:#04302f; font-weight:700; }
+.btn-teal:hover{ background:#0c8f8e; border-color:#0c8f8e; color:#fff; }
+.btn-outline-soft{ border:1px solid var(--border); color:var(--text); background:var(--surface); font-weight:600; }
+.btn-outline-soft:hover{ background:var(--gray-50); }
+
+/* Stat cards */
+.stat-card{
+  background:var(--surface); border:1px solid var(--border); border-radius:var(--radius);
+  padding:1.05rem 1.15rem; box-shadow:var(--shadow); position:relative; overflow:hidden;
+  height:100%;
+}
+.stat-card::before{
+  content:""; position:absolute; left:0; top:0; bottom:0; width:3px; background:var(--accent,var(--teal));
+}
+.stat-card .lbl{ font-size:.72rem; color:var(--text-dim); font-weight:700; text-transform:uppercase; letter-spacing:.04em; }
+.stat-card .val{ font-size:1.65rem; margin-top:.25rem; }
+.stat-card .icon-badge{
+  position:absolute; right:.9rem; top:.9rem; width:34px; height:34px; border-radius:10px;
+  display:flex; align-items:center; justify-content:center; font-size:.85rem;
+  background:var(--accent-dim,var(--teal-dim)); color:var(--accent,var(--teal));
+}
+.stat-card .trend{ font-size:.72rem; margin-top:.3rem; color:var(--text-dim); }
+.stat-card .trend.up{ color:var(--green); } .stat-card .trend.down{ color:var(--coral); }
+
+/* Panels */
+.panel{
+  background:var(--surface); border:1px solid var(--border); border-radius:var(--radius);
+  box-shadow:var(--shadow); padding:1.2rem 1.3rem;
+}
+.panel-head{ display:flex; align-items:center; justify-content:space-between; margin-bottom:1rem; }
+.panel-head h2{ font-size:.95rem; font-weight:700; margin:0; }
+.panel-head .muted{ font-size:.75rem; color:var(--text-dim); }
+
+.pill{ font-size:.68rem; font-weight:700; padding:.2rem .55rem; border-radius:20px; }
+.pill-teal{ background:var(--teal-dim); color:#0b7f7e;} 
+.pill-amber{ background:var(--amber-dim); color:#9a6c14;}
+.pill-coral{ background:var(--coral-dim); color:#a63c2c;}
+[data-theme="dark"] .pill-teal{color:var(--teal-light);}
+[data-theme="dark"] .pill-amber{color:#F0C773;}
+[data-theme="dark"] .pill-coral{color:#F0A090;}
+
+.list-row{ display:flex; align-items:center; gap:.8rem; padding:.6rem 0; border-bottom:1px solid var(--border); }
+.list-row:last-child{ border-bottom:none; }
+.list-row .av-sm{
+  width:34px; height:34px; border-radius:9px; background:var(--gray-100); color:var(--navy-800);
+  display:flex; align-items:center; justify-content:center; font-size:.7rem; font-weight:700; flex-shrink:0;
+}
+.list-row .ttl{ font-size:.82rem; font-weight:700; }
+.list-row .sub{ font-size:.72rem; color:var(--text-dim); }
+
+table.table{ font-size:.82rem; color:var(--text); }
+table.table thead th{
+  font-size:.68rem; text-transform:uppercase; letter-spacing:.05em; color:var(--text-dim);
+  border-bottom:1px solid var(--border); font-weight:700; padding-bottom:.6rem;
+}
+table.table td{ border-color:var(--border); vertical-align:middle; }
+
+/* Wave signature divider */
+.tide-divider{ height:34px; width:100%; overflow:hidden; line-height:0; margin:1.6rem 0 .2rem;}
+.tide-divider svg{ width:100%; height:100%; display:block; }
+
+.chip-dept{ display:inline-flex; align-items:center; gap:.4rem; font-size:.76rem; font-weight:600; color:var(--text-dim); }
+.chip-dept .sw{ width:9px; height:9px; border-radius:2.5px; }
+
+.mobile-toggle{ display:none; }
+@media (max-width:991px){
+  .sidebar{ position:fixed; left:0; margin-left:-260px; box-shadow:0 0 40px rgba(0,0,0,.35); }
+  .sidebar.open{ margin-left:0; }
+  .mobile-toggle{ display:flex; }
+  .page-pad{ padding:1.1rem 1rem 3rem; }
+}
+</style>
+</head>
+<body>
+
+<div class="app-shell">
+
+  <!-- ===== Sidebar ===== -->
+  <aside class="sidebar" id="sidebar">
+    <div class="brand">
+      <div class="brand-mark"><i class="fa-solid fa-anchor"></i></div>
+      <div class="brand-text">
+        <div class="b1">AMSC Offshore</div>
+        <div class="b2">HRM System</div>
+      </div>
+    </div>
+
+    <div class="nav-group-label">Overview</div>
+    <a class="side-link active"><i class="ico fa-solid fa-gauge-high"></i> Dashboard</a>
+
+    <div class="nav-group-label">Workforce</div>
+    <a class="side-link"><i class="ico fa-solid fa-users"></i> Employees</a>
+    <a class="side-link"><i class="ico fa-solid fa-calendar-check"></i> Attendance</a>
+    <a class="side-link"><i class="ico fa-solid fa-plane-departure"></i> Leave Management</a>
+    <a class="side-link"><i class="ico fa-solid fa-umbrella-beach"></i> Vacation Planner</a>
+    <a class="side-link"><i class="ico fa-solid fa-calendar-week"></i> Day-Off Roster</a>
+    <a class="side-link"><i class="ico fa-solid fa-notes-medical"></i> Sick Leave Register</a>
+    <a class="side-link"><i class="ico fa-solid fa-water"></i> Shift &amp; Roster</a>
+
+    <div class="nav-group-label">Records</div>
+    <a class="side-link"><i class="ico fa-solid fa-folder-open"></i> Documents <span class="badge-mini">7</span></a>
+    <a class="side-link"><i class="ico fa-solid fa-chart-column"></i> Reports</a>
+    <a class="side-link"><i class="ico fa-solid fa-list-check"></i> Audit Log</a>
+
+    <div class="nav-group-label">Administration</div>
+    <a class="side-link"><i class="ico fa-solid fa-gear"></i> Settings</a>
+    <a class="side-link"><i class="ico fa-solid fa-right-from-bracket"></i> Sign Out</a>
+
+    <div class="px-3 pb-4 pt-3">
+      <div class="tide-divider" style="margin:0 0 .6rem;">
+        <svg viewBox="0 0 400 30" preserveAspectRatio="none"><path d="M0,15 C50,30 100,0 150,15 C200,30 250,0 300,15 C350,30 380,10 400,15" fill="none" stroke="#1E4870" stroke-width="2"/></svg>
+      </div>
+      <div style="font-size:.65rem;color:#5C7A93;">© 2026 AMSC Station 05<br>Offshore Cage Operations</div>
+    </div>
+  </aside>
+
+  <div class="content">
+    <!-- ===== Topbar ===== -->
+    <div class="topbar">
+      <button class="icon-btn mobile-toggle" onclick="document.getElementById('sidebar').classList.toggle('open')">
+        <i class="fa-solid fa-bars"></i>
+      </button>
+      <div class="search-wrap">
+        <i class="fa-solid fa-magnifying-glass"></i>
+        <input type="text" placeholder="Search employee, passport no, visa, department…">
+      </div>
+      <div class="d-flex align-items-center gap-2 ms-auto">
+        <button class="icon-btn" id="themeToggle" title="Toggle dark mode"><i class="fa-solid fa-moon"></i></button>
+        <button class="icon-btn" title="Notifications"><i class="fa-regular fa-bell"></i><span class="dot"></span></button>
+        <div class="user-chip">
+          <div class="av">MI</div>
+          <div>
+            <div class="name">Muhamed I.</div>
+            <div class="role">Asst. Aquaculture Specialist</div>
+          </div>
+          <i class="fa-solid fa-chevron-down" style="font-size:.65rem;color:var(--text-dim);"></i>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== Page ===== -->
+    <div class="page-pad">
+      <div class="page-head">
+        <div>
+          <h1>Dashboard</h1>
+          <div class="sub">Station 05 · Wednesday, 5 August 2026 · Offshore Cage Operations</div>
+        </div>
+        <div class="d-flex gap-2">
+          <button class="btn btn-outline-soft btn-sm"><i class="fa-regular fa-calendar me-1"></i> This Month</button>
+          <button class="btn btn-teal btn-sm"><i class="fa-solid fa-plus me-1"></i> Quick Add</button>
+        </div>
+      </div>
+
+      <!-- Stat cards row 1 -->
+      <div class="row g-3">
+        <div class="col-6 col-md-4 col-xl-2">
+          <div class="stat-card" style="--accent:#0EA5A4;--accent-dim:rgba(14,165,164,.12);">
+            <div class="icon-badge"><i class="fa-solid fa-users"></i></div>
+            <div class="lbl">Total Employees</div>
+            <div class="val stat-num">86</div>
+            <div class="trend up"><i class="fa-solid fa-arrow-up"></i> 3 this month</div>
+          </div>
+        </div>
+        <div class="col-6 col-md-4 col-xl-2">
+          <div class="stat-card" style="--accent:#2F9E6E;--accent-dim:rgba(47,158,110,.12);">
+            <div class="icon-badge"><i class="fa-solid fa-user-check"></i></div>
+            <div class="lbl">Active Employees</div>
+            <div class="val stat-num">81</div>
+            <div class="trend">94.2% of total</div>
+          </div>
+        </div>
+        <div class="col-6 col-md-4 col-xl-2">
+          <div class="stat-card" style="--accent:#2F9E6E;--accent-dim:rgba(47,158,110,.12);">
+            <div class="icon-badge"><i class="fa-solid fa-circle-check"></i></div>
+            <div class="lbl">Present Today</div>
+            <div class="val stat-num">71</div>
+            <div class="trend up">88% attendance</div>
+          </div>
+        </div>
+        <div class="col-6 col-md-4 col-xl-2">
+          <div class="stat-card" style="--accent:#D9614F;--accent-dim:rgba(217,97,79,.12);">
+            <div class="icon-badge"><i class="fa-solid fa-circle-xmark"></i></div>
+            <div class="lbl">Absent Today</div>
+            <div class="val stat-num">4</div>
+            <div class="trend down">2 uninformed</div>
+          </div>
+        </div>
+        <div class="col-6 col-md-4 col-xl-2">
+          <div class="stat-card" style="--accent:#D89A2B;--accent-dim:rgba(216,154,43,.12);">
+            <div class="icon-badge"><i class="fa-solid fa-business-time"></i></div>
+            <div class="lbl">Late Today</div>
+            <div class="val stat-num">3</div>
+            <div class="trend">Boat transfer delay</div>
+          </div>
+        </div>
+        <div class="col-6 col-md-4 col-xl-2">
+          <div class="stat-card" style="--accent:#234C7C;--accent-dim:rgba(35,76,124,.12);">
+            <div class="icon-badge"><i class="fa-solid fa-water"></i></div>
+            <div class="lbl">Weekly Day Off</div>
+            <div class="val stat-num">9</div>
+            <div class="trend">Fri / Sat rotation</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Stat cards row 2 -->
+      <div class="row g-3 mt-1">
+        <div class="col-6 col-md-4 col-xl-2">
+          <div class="stat-card" style="--accent:#0EA5A4;--accent-dim:rgba(14,165,164,.12);">
+            <div class="icon-badge"><i class="fa-solid fa-umbrella-beach"></i></div>
+            <div class="lbl">On Leave</div>
+            <div class="val stat-num">6</div>
+            <div class="trend">Annual + emergency</div>
+          </div>
+        </div>
+        <div class="col-6 col-md-4 col-xl-2">
+          <div class="stat-card" style="--accent:#D9614F;--accent-dim:rgba(217,97,79,.12);">
+            <div class="icon-badge"><i class="fa-solid fa-notes-medical"></i></div>
+            <div class="lbl">Sick Leave Today</div>
+            <div class="val stat-num">2</div>
+            <div class="trend">MC on file</div>
+          </div>
+        </div>
+        <div class="col-6 col-md-4 col-xl-2">
+          <div class="stat-card" style="--accent:#234C7C;--accent-dim:rgba(35,76,124,.12);">
+            <div class="icon-badge"><i class="fa-solid fa-plane"></i></div>
+            <div class="lbl">Upcoming Vacations</div>
+            <div class="val stat-num">5</div>
+            <div class="trend">Next 30 days</div>
+          </div>
+        </div>
+        <div class="col-6 col-md-4 col-xl-2">
+          <div class="stat-card" style="--accent:#D89A2B;--accent-dim:rgba(216,154,43,.12);">
+            <div class="icon-badge"><i class="fa-solid fa-passport"></i></div>
+            <div class="lbl">Visa Expiring Soon</div>
+            <div class="val stat-num">4</div>
+            <div class="trend down">Within 60 days</div>
+          </div>
+        </div>
+        <div class="col-6 col-md-4 col-xl-2">
+          <div class="stat-card" style="--accent:#D89A2B;--accent-dim:rgba(216,154,43,.12);">
+            <div class="icon-badge"><i class="fa-solid fa-id-card"></i></div>
+            <div class="lbl">Passport Expiring</div>
+            <div class="val stat-num">3</div>
+            <div class="trend down">Within 90 days</div>
+          </div>
+        </div>
+        <div class="col-6 col-md-4 col-xl-2">
+          <div class="stat-card" style="--accent:#D9614F;--accent-dim:rgba(217,97,79,.12);">
+            <div class="icon-badge"><i class="fa-solid fa-file-signature"></i></div>
+            <div class="lbl">Contract Expiring</div>
+            <div class="val stat-num">2</div>
+            <div class="trend down">Within 45 days</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Charts + side panels -->
+      <div class="row g-3 mt-1">
+        <div class="col-lg-7">
+          <div class="panel h-100">
+            <div class="panel-head">
+              <h2>Attendance Trend — Last 14 Days</h2>
+              <span class="muted">Present vs Absent vs Leave</span>
+            </div>
+            <canvas id="attendanceChart" height="230"></canvas>
+          </div>
+        </div>
+        <div class="col-lg-5">
+          <div class="panel h-100">
+            <div class="panel-head">
+              <h2>Today's Attendance</h2>
+              <span class="pill pill-teal">88% present</span>
+            </div>
+            <canvas id="attendanceDonut" height="200"></canvas>
+            <div class="d-flex justify-content-center gap-3 mt-2 flex-wrap">
+              <span class="chip-dept"><span class="sw" style="background:#0EA5A4;"></span>Present</span>
+              <span class="chip-dept"><span class="sw" style="background:#D9614F;"></span>Absent</span>
+              <span class="chip-dept"><span class="sw" style="background:#D89A2B;"></span>On Leave</span>
+              <span class="chip-dept"><span class="sw" style="background:#234C7C;"></span>Day Off</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="row g-3 mt-1">
+        <div class="col-lg-5">
+          <div class="panel h-100">
+            <div class="panel-head">
+              <h2>Department Summary</h2>
+              <span class="muted">Headcount by unit</span>
+            </div>
+            <canvas id="deptChart" height="230"></canvas>
+          </div>
+        </div>
+
+        <div class="col-lg-4">
+          <div class="panel h-100">
+            <div class="panel-head">
+              <h2>Birthday Alerts</h2>
+              <span class="muted">This week</span>
+            </div>
+            <div class="list-row"><div class="av-sm">RP</div><div><div class="ttl">Ravi Perera</div><div class="sub">Cage Technician · Aug 6</div></div></div>
+            <div class="list-row"><div class="av-sm">FA</div><div><div class="ttl">Fatima Al Zaabi</div><div class="sub">HR Officer · Aug 8</div></div></div>
+            <div class="list-row"><div class="av-sm">NK</div><div><div class="ttl">Nuwan Kumara</div><div class="sub">Diver · Aug 10</div></div></div>
+          </div>
+        </div>
+
+        <div class="col-lg-3">
+          <div class="panel h-100">
+            <div class="panel-head">
+              <h2>Leave Summary</h2>
+            </div>
+            <div class="d-flex justify-content-between mb-2"><span class="sub">Annual</span><b>18</b></div>
+            <div class="progress mb-3" style="height:6px;"><div class="progress-bar" style="width:60%;background:#0EA5A4;"></div></div>
+            <div class="d-flex justify-content-between mb-2"><span class="sub">Sick</span><b>7</b></div>
+            <div class="progress mb-3" style="height:6px;"><div class="progress-bar" style="width:25%;background:#D9614F;"></div></div>
+            <div class="d-flex justify-content-between mb-2"><span class="sub">Emergency</span><b>3</b></div>
+            <div class="progress" style="height:6px;"><div class="progress-bar" style="width:12%;background:#D89A2B;"></div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Expiring documents table -->
+      <div class="row g-3 mt-1">
+        <div class="col-12">
+          <div class="panel">
+            <div class="panel-head">
+              <h2>Expiring Documents — Next 90 Days</h2>
+              <button class="btn btn-outline-soft btn-sm"><i class="fa-solid fa-file-export me-1"></i> Export</button>
+            </div>
+            <div class="table-responsive">
+              <table class="table table-hover mb-0">
+                <thead>
+                  <tr><th>Employee</th><th>Department</th><th>Document</th><th>Expiry Date</th><th>Days Left</th><th>Status</th></tr>
+                </thead>
+                <tbody>
+                  <tr><td>Sunil Fernando</td><td>Cage Operations</td><td>Visa</td><td>18 Aug 2026</td><td>13</td><td><span class="pill pill-coral">Urgent</span></td></tr>
+                  <tr><td>Ahmed Al Suwaidi</td><td>Logistics</td><td>Passport</td><td>02 Sep 2026</td><td>28</td><td><span class="pill pill-amber">Soon</span></td></tr>
+                  <tr><td>Dinesh Rathnayake</td><td>Diving &amp; Maintenance</td><td>Labour Card</td><td>10 Sep 2026</td><td>36</td><td><span class="pill pill-amber">Soon</span></td></tr>
+                  <tr><td>Mohammed Yasin</td><td>Feed &amp; Nutrition</td><td>Contract</td><td>22 Sep 2026</td><td>48</td><td><span class="pill pill-teal">Tracked</span></td></tr>
+                  <tr><td>Kasun Jayawardena</td><td>Hatchery</td><td>Emirates ID</td><td>30 Oct 2026</td><td>86</td><td><span class="pill pill-teal">Tracked</span></td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="tide-divider" style="opacity:.4;">
+        <svg viewBox="0 0 1200 30" preserveAspectRatio="none"><path d="M0,15 C100,30 200,0 300,15 C400,30 500,0 600,15 C700,30 800,0 900,15 C1000,30 1100,0 1200,15" fill="none" stroke="#0EA5A4" stroke-width="1.5"/></svg>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.4/chart.umd.min.js"></script>
+<script>
+// ---- Theme toggle ----
+const themeToggle = document.getElementById('themeToggle');
+const html = document.documentElement;
+themeToggle.addEventListener('click', () => {
+  const next = html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+  html.setAttribute('data-theme', next);
+  themeToggle.innerHTML = next === 'dark' ? '<i class="fa-solid fa-sun"></i>' : '<i class="fa-solid fa-moon"></i>';
+  renderCharts();
+});
+
+// ---- Chart theming helper ----
+function chartColors(){
+  const dark = html.getAttribute('data-theme') === 'dark';
+  return { grid: dark ? '#1D3C5B' : '#E3E9ED', text: dark ? '#8FA3B3' : '#66798A' };
+}
+
+let charts = {};
+function renderCharts(){
+  Object.values(charts).forEach(c => c.destroy());
+  const { grid, text } = chartColors();
+  Chart.defaults.font.family = "'Manrope', sans-serif";
+  Chart.defaults.color = text;
+
+  // Attendance trend (line)
+  charts.trend = new Chart(document.getElementById('attendanceChart'), {
+    type: 'line',
+    data: {
+      labels: ['Jul 23','24','25','26','27','28','29','30','31','Aug 1','2','3','4','5'],
+      datasets: [
+        { label:'Present', data:[74,76,72,70,73,75,68,70,74,76,71,73,72,71], borderColor:'#0EA5A4', backgroundColor:'rgba(14,165,164,.1)', tension:.35, fill:true, pointRadius:0, borderWidth:2 },
+        { label:'Absent', data:[3,2,4,5,3,2,6,4,3,2,4,3,3,4], borderColor:'#D9614F', backgroundColor:'transparent', tension:.35, pointRadius:0, borderWidth:2 },
+        { label:'On Leave', data:[7,6,8,9,8,7,10,9,7,6,8,7,6,6], borderColor:'#D89A2B', backgroundColor:'transparent', tension:.35, pointRadius:0, borderWidth:2 }
+      ]
+    },
+    options: {
+      responsive:true, maintainAspectRatio:true,
+      plugins:{ legend:{ position:'bottom', labels:{ boxWidth:8, boxHeight:8, usePointStyle:true } } },
+      scales:{ x:{ grid:{ display:false } }, y:{ grid:{ color:grid }, beginAtZero:true } }
+    }
+  });
+
+  // Donut - today's attendance
+  charts.donut = new Chart(document.getElementById('attendanceDonut'), {
+    type:'doughnut',
+    data:{
+      labels:['Present','Absent','On Leave','Day Off'],
+      datasets:[{ data:[71,4,6,5], backgroundColor:['#0EA5A4','#D9614F','#D89A2B','#234C7C'], borderWidth:0 }]
+    },
+    options:{ responsive:true, maintainAspectRatio:true, cutout:'68%', plugins:{ legend:{ display:false } } }
+  });
+
+  // Department bar
+  charts.dept = new Chart(document.getElementById('deptChart'), {
+    type:'bar',
+    data:{
+      labels:['Cage Ops','Diving','Logistics','Hatchery','Feed & Nutrition','Admin'],
+      datasets:[{ data:[24,14,11,9,15,13], backgroundColor:'#0EA5A4', borderRadius:6, maxBarThickness:34 }]
+    },
+    options:{
+      responsive:true, maintainAspectRatio:true,
+      plugins:{ legend:{ display:false } },
+      scales:{ x:{ grid:{ display:false } }, y:{ grid:{ color:grid }, beginAtZero:true } }
+    }
+  });
+}
+renderCharts();
+
+// ---- Mobile sidebar close on outside click ----
+document.addEventListener('click', (e)=>{
+  const sb = document.getElementById('sidebar');
+  const toggle = document.querySelector('.mobile-toggle');
+  if (window.innerWidth <= 991 && sb.classList.contains('open') && !sb.contains(e.target) && !toggle.contains(e.target)) {
+    sb.classList.remove('open');
+  }
+});
+</script>
+</body>
+</html>
